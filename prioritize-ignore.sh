@@ -49,7 +49,7 @@ echo "getting projectToken for repository default branch" $REPOTOKEN
 curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectAlertsByType", "userKey" : "'$WS_USERKEY'", "alertType": "SECURITY_VULNERABILITY",  "projectToken": "'$REPOTOKEN'","format" : "json"}' >> alerts.json
 echo "saving alerts.json"
 ### Get Previously Ignored Alerts
-declare -a IGNORED_ALERTS
+declare IGNORED_ALERTS
 IGNORED_ALERTS=($(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectIgnoredAlerts", "userKey" : "'$WS_USERKEY'",  "projectToken": "'$REPOTOKEN'" }' | jq -r '.alerts[].vulnerability.name'))
 echo "previously ignoreAlerts:" ${IGNORED_ALERTS[*]}
 
