@@ -50,18 +50,20 @@ curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{
 echo "saving alerts.json"
 ### Get Previously Ignored Alerts
 IGNORED_ALERTS=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectIgnoredAlerts", "userKey" : "'$WS_USERKEY'",  "projectToken": "'$REPOTOKEN'" }' | jq -r '.alerts[].vulnerability.name')
-echo "previously ignoreAlerts:" $IGNORED_ALERTS
+echo "previously ignoreAlerts:" ${IGNORED_ALERTS}
 
 greenshieldlist=$(cat greenshields.txt)
 ### Get CVE by GREEN Shield
 for GREENSHIELDVULN in $greenshieldlist
 do
-echo -e "${grn}GREENSHIELDVULN: $GREENSHIELDVULN${end}"
-
-if [[ ! " ${IGNORED_ALERTS[@]} " =~ " ${GREENSHIELDVULN} " ]]; then
-    ALERT=$(jq --arg GREENSHIELDVULN $GREENSHIELDVULN '.alerts[] | select(.vulnerability.name==$GREENSHIELDVULN)|.alertUuid' alerts.json)
-    IGNORES+=$ALERT,
-fi
+    echo -e "${grn}GREENSHIELDVULN: $GREENSHIELDVULN${end}"
+    for item in ${IGNORED_ALERTS[@]}; do
+    if [[ ! " $item " =~ " ${GREENSHIELDVULN} " ]]; then
+        ALERT=$(jq --arg GREENSHIELDVULN $GREENSHIELDVULN '.alerts[] | select(.vulnerability.name==$GREENSHIELDVULN)|.alertUuid' alerts.json)
+        #IGNORES+=$ALERT,
+        IGNORES+=$item,
+    fi
+    done
 done
 
 if [ -z "$IGNORES" ]
