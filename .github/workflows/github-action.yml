@@ -53,6 +53,4 @@ jobs:
           chmod +x ./check-project-state.sh && ./check-project-state.sh
           
       - name: Prioritize Ignore
-        chmod +x ./prioritize-ignore.sh
-        run: sh ./prioritize-ignore.sh          
-        
+        run: chmod +x ./prioritize-ignore.sh && ./prioritize-ignore.sh 
