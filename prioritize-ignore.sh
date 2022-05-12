@@ -50,7 +50,7 @@ curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{
 echo "saving alerts.json"
 ### Get Previously Ignored Alerts
 IGNORED_ALERTS=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectIgnoredAlerts", "userKey" : "'$WS_USERKEY'",  "projectToken": "'$REPOTOKEN'" }' | jq -r '.alerts[].vulnerability.name')
-echo "previously ignoreAlerts:" ${IGNORED_ALERTS[*]}
+echo "previously ignoreAlerts:" $IGNORED_ALERTS
 
 greenshieldlist=$(cat greenshields.txt)
 ### Get CVE by GREEN Shield
