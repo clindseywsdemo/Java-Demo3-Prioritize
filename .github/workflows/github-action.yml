@@ -51,11 +51,6 @@ jobs:
         run: |
           curl -LJO https://raw.githubusercontent.com/whitesource-ft/ws-examples/main/Scripts/check-project-state.sh
           chmod +x ./check-project-state.sh && ./check-project-state.sh
-      - name: Prioritize GH Issue Comments
-        run: |
-          curl -LJO https://raw.githubusercontent.com/whitesource-ft/ws-examples/main/Scripts/ghissue-eua.sh
-          chmod +x ./ghissue-eua.sh && ./ghissue-eua.sh
           
-        #Run the prioritize cleanup script
-      - name: Prioritize Cleanup
+      - name: Prioritize Ignore
         run: sh ./prioritize-ignore.sh          
