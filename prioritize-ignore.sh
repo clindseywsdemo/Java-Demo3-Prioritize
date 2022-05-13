@@ -77,4 +77,4 @@ fi
 
 echo "Copy output files to artifacts"
 mkdir artifacts
-cp *.txt artifacts/
+cp *.json artifacts/
