@@ -34,7 +34,7 @@ end=$'\e[0m'
 
 
 ### getProjectSecurityAlertsbyVulnerabilityReport - finds Green Shields
-curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getProjectSecurityAlertsByVulnerabilityReport", "userKey" : "'$WS_USERKEY'", "projectToken": "'$WS_PROJECTTOKEN'", "format" : "json"}' | jq -r '.alerts[] | select(.euaShield=="GREEN") | .vulnerabilityId' >> greenshields.txt
+curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getProjectSecurityAlertsByVulnerabilityReport", "userKey" : "'$WS_USERKEY'", "projectToken": "'$WS_PROJECTTOKEN'", "format" : "json"}' | jq -r '.alerts[] | select(.euaShield=="GREEN") | .vulnerabilityId' >> /artifacts/greenshields.txt
 echo "saving greenshields.txt"
 
 # Get productToken from WS_PRODUCTNAME
@@ -46,8 +46,9 @@ REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application
 echo "getting projectToken for repository default branch" $REPOTOKEN
 
 ### getProjectAlertsbyType for repo default branch
-curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectAlertsByType", "userKey" : "'$WS_USERKEY'", "alertType": "SECURITY_VULNERABILITY",  "projectToken": "'$REPOTOKEN'","format" : "json"}' >> alerts.json
+curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectAlertsByType", "userKey" : "'$WS_USERKEY'", "alertType": "SECURITY_VULNERABILITY",  "projectToken": "'$REPOTOKEN'","format" : "json"}' >> /artifacts/alerts.json
 echo "saving alerts.json"
+
 ### Get Previously Ignored Alerts
 declare -a IGNORED_ALERTS
 IGNORED_ALERTS=($(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectIgnoredAlerts", "userKey" : "'$WS_USERKEY'",  "projectToken": "'$REPOTOKEN'" }' | jq -r '.alerts[].vulnerability.name'))
@@ -60,7 +61,7 @@ do
 echo -e "${grn}GREENSHIELDVULN: $GREENSHIELDVULN${end}"
 
 if [[ ! " ${IGNORED_ALERTS[*]} " =~ " ${GREENSHIELDVULN} " ]]; then
-    ALERT=$(jq --arg GREENSHIELDVULN $GREENSHIELDVULN '.alerts[] | select(.vulnerability.name==$GREENSHIELDVULN)|.alertUuid' alerts.json)
+    ALERT=$(jq --arg GREENSHIELDVULN $GREENSHIELDVULN '.alerts[] | select(.vulnerability.name==$GREENSHIELDVULN)|.alertUuid' /artifacts/alerts.json)
     IGNORES+=$ALERT,
 fi
 done
