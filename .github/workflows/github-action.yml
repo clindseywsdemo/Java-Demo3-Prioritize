@@ -2,7 +2,9 @@ name: Whitesource Prioritize Java with Maven & Github Issue comments
 
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
+      - 'feature/**'
 
 jobs:
   build:
