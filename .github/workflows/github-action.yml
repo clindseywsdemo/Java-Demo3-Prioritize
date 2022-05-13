@@ -52,9 +52,6 @@ jobs:
           curl -LJO https://raw.githubusercontent.com/whitesource-ft/ws-examples/main/Scripts/check-project-state.sh
           chmod +x ./check-project-state.sh && ./check-project-state.sh
           
-      - name: Create a temporary artifact folder
-        run: mkdir artifacts
-          
       - name: Prioritize Ignore
         run: chmod +x ./prioritize-ignore.sh && ./prioritize-ignore.sh 
         
@@ -62,4 +59,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: assests-created
-          path: artifacts
+          path: /artifacts
