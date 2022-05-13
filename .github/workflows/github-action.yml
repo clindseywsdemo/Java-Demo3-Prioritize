@@ -55,7 +55,7 @@ jobs:
       - name: Prioritize Ignore
         run: chmod +x ./prioritize-ignore.sh && ./prioritize-ignore.sh 
         
-      - name: Save Artifacts
+      - name: Save Artifact(s)
         uses: actions/upload-artifact@v2
         with:
           name: assests-created
