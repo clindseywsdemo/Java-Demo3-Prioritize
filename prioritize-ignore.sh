@@ -11,7 +11,19 @@
 # TODO - Add ERROR handling
 # TODO - Only works with default branch
 # TODO - Only works when WS_PRODUCTNAME=WS_PROJECTNAME for ignore
-# TODO -  Delete prioritize project aftewards and publish report to pipeline
+# TODO - Delete prioritize project aftewards and publish report to pipeline
+
+#Enable Error Handler
+set -e
+trap 'catch $? $LINENO' EXIT
+
+#Error Handler Logic
+catch() {
+if [ "$!" != "0" ]; then
+        echo "Error $1 occurred on $2.  Exiting..." 
+    fi
+    exit 1
+}
 
 WS_PROJECTTOKEN=$(jq -r '.projects | .[] | .projectToken' ./whitesource/scanProjectDetails.json)
 WS_URL=$(echo $WS_WSS_URL | awk -F "/agent" '{print $1}')
@@ -41,9 +53,19 @@ echo "saving greenshields.txt"
 WS_PRODUCTTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProducts",   "userKey" : "'$WS_USERKEY'",  "orgToken": "'$WS_APIKEY'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.products[] | select(.productName==$WS_PRODUCTNAME) | .productToken')
 echo "getting productToken" $WS_PRODUCTTOKEN
 
+if [ -z "$WS_PRODUCTTOKEN" ] then
+    echo "productToken is empty - Exiting"
+    exit
+fi
+
 # Get repo default branch projectToken from productToken
 REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
 echo "getting projectToken for repository default branch" $REPOTOKEN
+
+if [ -z "$REPOTOKEN" ] then
+    echo "productToken for repository default branch is empty - Exiting"
+    exit
+fi
 
 ### getProjectAlertsbyType for repo default branch
 curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectAlertsByType", "userKey" : "'$WS_USERKEY'", "alertType": "SECURITY_VULNERABILITY",  "projectToken": "'$REPOTOKEN'","format" : "json"}' >> alerts.json
@@ -58,23 +80,23 @@ greenshieldlist=$(cat greenshields.txt)
 ### Get CVE by GREEN Shield
 for GREENSHIELDVULN in $greenshieldlist
 do
-echo -e "${grn}GREENSHIELDVULN: $GREENSHIELDVULN${end}"
+    echo -e "${grn}GREENSHIELDVULN: $GREENSHIELDVULN${end}"
 
-if [[ ! " ${IGNORED_ALERTS[*]} " =~ " ${GREENSHIELDVULN} " ]]; then
-    ALERT=$(jq --arg GREENSHIELDVULN $GREENSHIELDVULN '.alerts[] | select(.vulnerability.name==$GREENSHIELDVULN)|.alertUuid' alerts.json)
-    IGNORES+=$ALERT,
-fi
+    if [[ ! " ${IGNORED_ALERTS[*]} " =~ " ${GREENSHIELDVULN} " ]]; then
+        ALERT=$(jq --arg GREENSHIELDVULN $GREENSHIELDVULN '.alerts[] | select(.vulnerability.name==$GREENSHIELDVULN)|.alertUuid' alerts.json)
+        IGNORES+=$ALERT,
+    fi
 done
 
 if [ -z "$IGNORES" ]
-then
-      echo "$IGNORES All Alerts were previously ignored"
-else
-      IGNORE_ALERTS=${IGNORES::-1}
-      echo "${yel}Ignoring the following alertUuids $IGNORE_ALERTS${end}"
-      curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "ignoreAlerts", "userKey" : "'$WS_USERKEY'", "orgToken" : "'$WS_APIKEY'", "alertUuids" : ['$IGNORE_ALERTS'], "comments" : "green shield vulnerabilities are not reachable or exploitable and have been ignored"}'
+    then
+          echo "$IGNORES All Alerts were previously ignored"
+    else
+          IGNORE_ALERTS=${IGNORES::-1}
+          echo "${yel}Ignoring the following alertUuids $IGNORE_ALERTS${end}"
+          curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "ignoreAlerts", "userKey" : "'$WS_USERKEY'", "orgToken" : "'$WS_APIKEY'", "alertUuids" : ['$IGNORE_ALERTS'], "comments" : "green shield vulnerabilities are not reachable or exploitable and have been ignored"}'
 fi
 
 echo "Copy output files to artifacts"
 mkdir artifacts
-cp *.json artifacts/
+cp *.json *.txt artifacts/
