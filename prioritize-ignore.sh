@@ -44,7 +44,6 @@ cyn=$'\e[1;36m'
 end=$'\e[0m'
 
 
-
 ### getProjectSecurityAlertsbyVulnerabilityReport - finds Green Shields
 curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getProjectSecurityAlertsByVulnerabilityReport", "userKey" : "'$WS_USERKEY'", "projectToken": "'$WS_PROJECTTOKEN'", "format" : "json"}' | jq -r '.alerts[] | select(.euaShield=="GREEN") | .vulnerabilityId' >> greenshields.txt
 echo "saving greenshields.txt"
@@ -97,6 +96,6 @@ if [ -z "$IGNORES" ]
           curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "ignoreAlerts", "userKey" : "'$WS_USERKEY'", "orgToken" : "'$WS_APIKEY'", "alertUuids" : ['$IGNORE_ALERTS'], "comments" : "green shield vulnerabilities are not reachable or exploitable and have been ignored"}'
 fi
 
-echo "Copy output files to artifacts"
+echo "Copy output files to artifact(s0"
 mkdir artifacts
 cp *.json *.txt artifacts/
