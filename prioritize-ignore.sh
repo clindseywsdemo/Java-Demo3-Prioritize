@@ -34,7 +34,7 @@ end=$'\e[0m'
 
 
 ### getProjectSecurityAlertsbyVulnerabilityReport - finds Green Shields
-curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getProjectSecurityAlertsByVulnerabilityReport", "userKey" : "'$WS_USERKEY'", "projectToken": "'$WS_PROJECTTOKEN'", "format" : "json"}' | jq -r '.alerts[] | select(.euaShield=="GREEN") | .vulnerabilityId' >> /artifacts/greenshields.txt
+curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getProjectSecurityAlertsByVulnerabilityReport", "userKey" : "'$WS_USERKEY'", "projectToken": "'$WS_PROJECTTOKEN'", "format" : "json"}' | jq -r '.alerts[] | select(.euaShield=="GREEN") | .vulnerabilityId' >> greenshields.txt
 echo "saving greenshields.txt"
 
 # Get productToken from WS_PRODUCTNAME
@@ -46,7 +46,7 @@ REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application
 echo "getting projectToken for repository default branch" $REPOTOKEN
 
 ### getProjectAlertsbyType for repo default branch
-curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectAlertsByType", "userKey" : "'$WS_USERKEY'", "alertType": "SECURITY_VULNERABILITY",  "projectToken": "'$REPOTOKEN'","format" : "json"}' >> /artifacts/alerts.json
+curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json' -d '{ "requestType" : "getProjectAlertsByType", "userKey" : "'$WS_USERKEY'", "alertType": "SECURITY_VULNERABILITY",  "projectToken": "'$REPOTOKEN'","format" : "json"}' >> alerts.json
 echo "saving alerts.json"
 
 ### Get Previously Ignored Alerts
@@ -61,7 +61,7 @@ do
 echo -e "${grn}GREENSHIELDVULN: $GREENSHIELDVULN${end}"
 
 if [[ ! " ${IGNORED_ALERTS[*]} " =~ " ${GREENSHIELDVULN} " ]]; then
-    ALERT=$(jq --arg GREENSHIELDVULN $GREENSHIELDVULN '.alerts[] | select(.vulnerability.name==$GREENSHIELDVULN)|.alertUuid' /artifacts/alerts.json)
+    ALERT=$(jq --arg GREENSHIELDVULN $GREENSHIELDVULN '.alerts[] | select(.vulnerability.name==$GREENSHIELDVULN)|.alertUuid' alerts.json)
     IGNORES+=$ALERT,
 fi
 done
@@ -74,3 +74,6 @@ else
       echo "${yel}Ignoring the following alertUuids $IGNORE_ALERTS${end}"
       curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "ignoreAlerts", "userKey" : "'$WS_USERKEY'", "orgToken" : "'$WS_APIKEY'", "alertUuids" : ['$IGNORE_ALERTS'], "comments" : "green shield vulnerabilities are not reachable or exploitable and have been ignored"}'
 fi
+
+echo "Copy output files to artifacts"
+cp *.txt /artifacts
