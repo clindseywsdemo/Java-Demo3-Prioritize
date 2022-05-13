@@ -19,10 +19,10 @@ trap 'catch $? $LINENO' EXIT
 
 #Error Handler Logic
 catch() {
-if [ "$!" != "0" ]; then
+if [ "$1" != "0" ]; then
         echo "Error $1 occurred on $2.  Exiting..." 
     fi
-    exit 1
+    exit
 }
 
 WS_PROJECTTOKEN=$(jq -r '.projects | .[] | .projectToken' ./whitesource/scanProjectDetails.json)
