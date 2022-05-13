@@ -76,5 +76,5 @@ else
 fi
 
 echo "Copy output files to artifacts"
-mkdir /artifacts
-cp *.txt /artifacts
+mkdir artifacts
+cp *.txt artifacts/
