@@ -6,7 +6,7 @@
 	<groupId>org.t246osslab.easybuggy</groupId>
 	<artifactId>easybuggy</artifactId>
 	<version>1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>WAR</packaging>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
