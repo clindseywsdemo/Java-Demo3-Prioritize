@@ -53,7 +53,7 @@ echo "saving greenshields.txt"
 WS_PRODUCTTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProducts",   "userKey" : "'$WS_USERKEY'",  "orgToken": "'$WS_APIKEY'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.products[] | select(.productName==$WS_PRODUCTNAME) | .productToken')
 echo "getting productToken" $WS_PRODUCTTOKEN
 
-if [ -z "$WS_PRODUCTTOKEN" ] then
+if [ -z "$WS_PRODUCTTOKEN" ]; then
     echo "productToken is empty - Exiting"
     exit
 fi
@@ -62,7 +62,7 @@ fi
 REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
 echo "getting projectToken for repository default branch" $REPOTOKEN
 
-if [ -z "$REPOTOKEN" ] then
+if [ -z "$REPOTOKEN" ]; then
     echo "productToken for repository default branch is empty - Exiting"
     exit
 fi
