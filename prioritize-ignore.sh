@@ -44,7 +44,6 @@ cyn=$'\e[1;36m'
 end=$'\e[0m'
 
 
-
 ### getProjectSecurityAlertsbyVulnerabilityReport - finds Green Shields
 curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getProjectSecurityAlertsByVulnerabilityReport", "userKey" : "'$WS_USERKEY'", "projectToken": "'$WS_PROJECTTOKEN'", "format" : "json"}' | jq -r '.alerts[] | select(.euaShield=="GREEN") | .vulnerabilityId' >> greenshields.txt
 echo "saving greenshields.txt"
