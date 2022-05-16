@@ -8,6 +8,7 @@
 # WS_APIKEY
 # WS_WSS_URL
 
+
 # TODO - Add ERROR handling (Done)
 # TODO - Only works with default branch (In-Process)
 # TODO - Only works when WS_PRODUCTNAME=WS_PROJECTNAME for ignore
@@ -28,12 +29,13 @@ if [ "$1" != "0" ]; then
 WS_PROJECTTOKEN=$(jq -r '.projects | .[] | .projectToken' ./whitesource/scanProjectDetails.json)
 WS_URL=$(echo $WS_WSS_URL | awk -F "/agent" '{print $1}')
 echo "variables for local debugging"
-echo "export WS_APIKEY=<add your key>"
-echo "export WS_USERKEY=<add your key>"
+echo "export WS_APIKEY=<add your key>"$WS_APIKEY
+echo "export WS_USERKEY=<add your key>"$WS_USERKEY
 echo "export WS_PRODUCTNAME="$WS_PRODUCTNAME
 echo "export WS_PROJECTNAME="$WS_PROJECTNAME
 echo "export WS_PROJECTTOKEN="$WS_PROJECTTOKEN
 echo "export WS_URL="$WS_URL
+
 
 red=$'\e[1;31m'
 grn=$'\e[1;32m'
