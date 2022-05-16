@@ -29,8 +29,8 @@ if [ "$1" != "0" ]; then
 WS_PROJECTTOKEN=$(jq -r '.projects | .[] | .projectToken' ./whitesource/scanProjectDetails.json)
 WS_URL=$(echo $WS_WSS_URL | awk -F "/agent" '{print $1}')
 echo "variables for local debugging"
-echo "export WS_APIKEY=<add your key>"$WS_APIKEY
-echo "export WS_USERKEY=<add your key>"$WS_USERKEY
+echo "export WS_APIKEY=<add your key>"
+echo "export WS_USERKEY=<add your key>"
 echo "export WS_PRODUCTNAME="$WS_PRODUCTNAME
 echo "export WS_PROJECTNAME="$WS_PROJECTNAME
 echo "export WS_PROJECTTOKEN="$WS_PROJECTTOKEN
@@ -61,11 +61,11 @@ if [ -z "$WS_PRODUCTTOKEN" ]; then
 fi
 
 # Get repo default branch projectToken from productToken
-REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
+REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PROJECTNAME) | .projectToken')
 echo "getting projectToken for repository default branch" $REPOTOKEN
 
 if [ -z "$REPOTOKEN" ]; then
-    echo "productToken for repository default branch is empty - Exiting"
+    echo "productToken for repository default branch is empty - Exiting ('$WS_USERKEY')"
     exit
 fi
 
