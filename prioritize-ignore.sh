@@ -8,8 +8,8 @@
 # WS_APIKEY
 # WS_WSS_URL
 
-# TODO - Add ERROR handling
-# TODO - Only works with default branch
+# TODO - Add ERROR handling (Done)
+# TODO - Only works with default branch (In-Process)
 # TODO - Only works when WS_PRODUCTNAME=WS_PROJECTNAME for ignore
 # TODO - Delete prioritize project aftewards and publish report to pipeline
 
