@@ -67,8 +67,10 @@ arr=( $WS_BASEBRANCHLIST )
 
 for BASEBRANCH in "${arr[@]}"; do
     echo "Checking this branch: "$BASEBRANCH
+    echo "Checking github branch: "$GITHUB_BASEBRANCH
     if [[ $BASEBRANCH = $GITHUB_BASEBRANCH ]]; then
         wORKING_BASEBRANCH=$BASEBRANCH
+        echo "Set branch to: "$BASEBRANCH
     fi
 done
 echo "Base branch to be used "$wORKING_BASEBRANCH
