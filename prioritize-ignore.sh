@@ -66,7 +66,7 @@ echo "Looking for base branch"
 for BASEBRANCH in jq .scanSettings.baseBranches .whiteSource
 do
     if [[ ! " ${BASEBRANCH[*]} " =~ " ${WS_PROJECTNAME} " ]]; then
-        wORKING_BASEBRANCH = $BASEBRANCH
+        $wORKING_BASEBRANCH = $BASEBRANCH
     fi
 done
 echo "Looking for base branch complete"
