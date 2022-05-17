@@ -61,18 +61,15 @@ if [ -z "$WS_PRODUCTTOKEN" ]; then
     exit
 fi
 
+echo "Looking for base branch"
 # Get repo default branch projectToken from productToken
-
-
 for BASEBRANCH in jq .scanSettings.baseBranches .whiteSource
 do
-        echo "Testing: "$BASEBRANCH
     if [[ ! " ${BASEBRANCH[*]} " =~ " ${WS_PROJECTNAME} " ]]; then
         wORKING_BASEBRANCH = $BASEBRANCH
-        echo 'Set working basebranch to "$wORKING_BASEBRANCH
     fi
 done
-
+echo "Looking for base branch complete"
 
 # Get repo default branch projectToken from productToken
 REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
