@@ -35,6 +35,8 @@ echo "export WS_PRODUCTNAME="$WS_PRODUCTNAME
 echo "export WS_PROJECTNAME="$WS_PROJECTNAME
 echo "export WS_PROJECTTOKEN="$WS_PROJECTTOKEN
 echo "export WS_URL="$WS_URL
+echo "export GITHUB_BASEBRANCH="$GITHUB_BASE_REF
+echo "export wORKING_BASEBRANCH="$wORKING_BASEBRANCH
 
 
 red=$'\e[1;31m'
@@ -44,7 +46,6 @@ blu=$'\e[1;34m'
 mag=$'\e[1;35m'
 cyn=$'\e[1;36m'
 end=$'\e[0m'
-
 
 
 ### getProjectSecurityAlertsbyVulnerabilityReport - finds Green Shields
@@ -61,14 +62,30 @@ if [ -z "$WS_PRODUCTTOKEN" ]; then
 fi
 
 # Get repo default branch projectToken from productToken
-REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
-echo "getting projectToken for repository default branch" $REPOTOKEN
+WS_BASEBRANCHLIST=$(jq .scanSettings.baseBranches .whitesource)
+WS_BASEBRANCHLIST=$(echo $WS_BASEBRANCHLIST | sed -e 's/\[ //g' -e 's/\ ]//g' -e 's/\,//g')
+arr=( $WS_BASEBRANCHLIST )
 
-#If REPOTOKEN is empty, then default back to the project
-if [ -z "$REPOTOKEN" ]; then
-        REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PROJECTNAME $WS_PROJECTNAME '.projects[] | select(.projectName==$WS_PROJECTNAME) | .projectToken')
-        echo "getting fallback projectToken for repository default branch" $REPOTOKEN
+for BASEBRANCH in "${arr[@]}"; do
+    echo "Checking this branch: "$BASEBRANCH
+    if [[ " ${BASEBRANCH[*]} " = " ${WS_PROJECTNAME} " ]]; then
+        wORKING_BASEBRANCH=$BASEBRANCH
+    fi
+done
+echo "Base branch to be used "$wORKING_BASEBRANCH
+
+if [ -z "$wORKING_BASEBRANCH" ]; then
+    echo "This branch '"$WS_PROJECTNAME"' was not found in the baseBranch list in the .whitesource file.  Exiting since there is nothing to be done."
+    exit
 fi
+
+
+# Get repo default branch projectToken from productToken
+#REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
+#echo "getting projectToken for repository default branch" $REPOTOKEN
+
+REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg wORKING_BASEBRANCH $wORKING_BASEBRANCH '.projects[] | select(.projectName==$wORKING_BASEBRANCH) | .projectToken')
+echo "getting projectToken for repository default branch" $REPOTOKEN
         
 if [ -z "$REPOTOKEN" ]; then
         echo "productToken for repository default branch is empty - Exiting ('$WS_USERKEY')"
