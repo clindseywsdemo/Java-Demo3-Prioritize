@@ -63,8 +63,10 @@ fi
 
 echo "Looking for base branch"
 # Get repo default branch projectToken from productToken
-WS_BASEBRANCHLIST=$(jq .scanSettings.baseBranches .whiteSource)
-for BASEBRANCH in WS_BASEBRANCHLIST
+WS_BASEBRANCHLIST=$(jq .scanSettings.baseBranches .whitesource)
+arr(WS_BASEBRANCHLIST)
+
+for BASEBRANCH in "${arr[@]}"; 
 do
     echo "Checking this branch: "$BASEBRANCH
     if [[ " ${BASEBRANCH[*]} " = " ${WS_PROJECTNAME} " ]]; then
