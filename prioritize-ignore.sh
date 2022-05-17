@@ -36,6 +36,7 @@ echo "export WS_PROJECTNAME="$WS_PROJECTNAME
 echo "export WS_PROJECTTOKEN="$WS_PROJECTTOKEN
 echo "export WS_URL="$WS_URL
 echo "export GITHUB_BASEBRANCH="$GITHUB_BASE_REF
+echo "export wORKING_BASEBRANCH="$wORKING_BASEBRANCH
 
 
 red=$'\e[1;31m'
@@ -61,12 +62,25 @@ if [ -z "$WS_PRODUCTTOKEN" ]; then
 fi
 
 # Get repo default branch projectToken from productToken
+
+
+for BASEBRANCH in jq .scanSettings.baseBranches .whiteSource
+do
+        echo "Testing: "$BASEBRANCH
+    if [[ ! " ${BASEBRANCH[*]} " =~ " ${WS_PROJECTNAME} " ]]; then
+        wORKING_BASEBRANCH = $BASEBRANCH
+        echo 'Set working basebranch to "$wORKING_BASEBRANCH
+    fi
+done
+
+
+# Get repo default branch projectToken from productToken
 REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
 echo "getting projectToken for repository default branch" $REPOTOKEN
 
 #If REPOTOKEN is empty, then default back to the project
 if [ -z "$REPOTOKEN" ]; then
-        REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PROJECTNAME $WS_PROJECTNAME '.projects[] | select(.projectName==$WS_PROJECTNAME) | .projectToken')
+        REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg wORKING_BASEBRANCH $wORKING_BASEBRANCH '.projects[] | select(.projectName==$wORKING_BASEBRANCH) | .projectToken')
         echo "getting fallback projectToken for repository default branch" $REPOTOKEN
 fi
         
