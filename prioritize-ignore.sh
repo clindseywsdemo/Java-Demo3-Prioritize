@@ -8,8 +8,9 @@
 # WS_APIKEY
 # WS_WSS_URL
 
-# TODO - Add ERROR handling
-# TODO - Only works with default branch
+
+# TODO - Add ERROR handling (Done)
+# TODO - Only works with default branch (In-Process)
 # TODO - Only works when WS_PRODUCTNAME=WS_PROJECTNAME for ignore
 # TODO - Delete prioritize project aftewards and publish report to pipeline
 
@@ -34,6 +35,9 @@ echo "export WS_PRODUCTNAME="$WS_PRODUCTNAME
 echo "export WS_PROJECTNAME="$WS_PROJECTNAME
 echo "export WS_PROJECTTOKEN="$WS_PROJECTTOKEN
 echo "export WS_URL="$WS_URL
+echo "export GITHUB_BASEBRANCH="$GITHUB_BASE_REF
+echo "export wORKING_BASEBRANCH="$wORKING_BASEBRANCH
+
 
 red=$'\e[1;31m'
 grn=$'\e[1;32m'
@@ -58,11 +62,33 @@ if [ -z "$WS_PRODUCTTOKEN" ]; then
 fi
 
 # Get repo default branch projectToken from productToken
-REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
-echo "getting projectToken for repository default branch" $REPOTOKEN
+WS_BASEBRANCHLIST=$(jq .scanSettings.baseBranches .whitesource)
+WS_BASEBRANCHLIST=$(echo $WS_BASEBRANCHLIST | sed -e 's/\[ //g' -e 's/\ ]//g' -e 's/\,//g')
+arr=( $WS_BASEBRANCHLIST )
 
+for BASEBRANCH in "${arr[@]}"; do
+    echo "Checking this branch: "$BASEBRANCH
+    if [[ " ${BASEBRANCH[*]} " = " ${WS_PROJECTNAME} " ]]; then
+        wORKING_BASEBRANCH=$BASEBRANCH
+    fi
+done
+echo "Base branch to be used "$wORKING_BASEBRANCH
+
+if [ -z "$wORKING_BASEBRANCH" ]; then
+    echo "This branch '"$WS_PROJECTNAME"' was not found in the baseBranch list in the .whitesource file.  Exiting since there is nothing to be done."
+    exit
+fi
+
+
+# Get repo default branch projectToken from productToken
+#REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
+#echo "getting projectToken for repository default branch" $REPOTOKEN
+
+REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg wORKING_BASEBRANCH $wORKING_BASEBRANCH '.projects[] | select(.projectName==$wORKING_BASEBRANCH) | .projectToken')
+echo "getting projectToken for repository default branch" $REPOTOKEN
+        
 if [ -z "$REPOTOKEN" ]; then
-    echo "productToken for repository default branch is empty - Exiting"
+        echo "productToken for repository default branch is empty - Exiting ('$WS_USERKEY')"
     exit
 fi
 
@@ -96,6 +122,6 @@ if [ -z "$IGNORES" ]
           curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "ignoreAlerts", "userKey" : "'$WS_USERKEY'", "orgToken" : "'$WS_APIKEY'", "alertUuids" : ['$IGNORE_ALERTS'], "comments" : "green shield vulnerabilities are not reachable or exploitable and have been ignored"}'
 fi
 
-echo "Copy output files to artifact folder"
+echo "Copy output files to artifact s "
 mkdir artifacts
 cp *.json *.txt artifacts/
