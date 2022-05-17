@@ -62,7 +62,7 @@ if [ -z "$WS_PRODUCTTOKEN" ]; then
 fi
 
 # Get repo default branch projectToken from productToken
-WS_BASEBRANCHLIST=$(jq .scanSettings.baseBranches .whiteSource)
+WS_BASEBRANCHLIST=$(jq .scanSettings.baseBranches .whitesource)
 WS_BASEBRANCHLIST=$(echo $WS_BASEBRANCHLIST | sed -e 's/\[ //g' -e 's/\ ]//g' -e 's/\,//g')
 arr=( $WS_BASEBRANCHLIST )
 
