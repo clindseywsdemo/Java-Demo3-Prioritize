@@ -35,6 +35,7 @@ echo "export WS_PRODUCTNAME="$WS_PRODUCTNAME
 echo "export WS_PROJECTNAME="$WS_PROJECTNAME
 echo "export WS_PROJECTTOKEN="$WS_PROJECTTOKEN
 echo "export WS_URL="$WS_URL
+echo "export WS_PRODUCTNAMESECONDARY=GH_"$WS_PRODUCTNAME
 
 
 red=$'\e[1;31m'
@@ -65,7 +66,7 @@ echo "getting projectToken for repository default branch" $REPOTOKEN
 
 #If REPOTOKEN is empty, then default back to the project
 if [ -z "$REPOTOKEN" ]; then
-        REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME "GH_"$WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PROJECTNAME) | .projectToken')
+        REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAMESECONDARY $WS_PRODUCTNAMESECONDARY '.projects[] | select(.projectName==$WS_PRODUCTNAMESECONDARY) | .projectToken')
         echo "getting fallback projectToken for repository default branch" $REPOTOKEN
 fi
         
