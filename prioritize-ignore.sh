@@ -67,7 +67,7 @@ arr=( $WS_BASEBRANCHLIST )
 
 for BASEBRANCH in "${arr[@]}"; do
     echo "Checking this branch: "$BASEBRANCH
-    if [[ " ${BASEBRANCH[*]} " = " ${GITHUB_BASEBRANCH} " ]]; then
+    if [[ $(BASEBRANCH) = $(GITHUB_BASEBRANCH) ]]; then
         wORKING_BASEBRANCH=$BASEBRANCH
     fi
 done
