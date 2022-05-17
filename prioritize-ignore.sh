@@ -35,8 +35,7 @@ echo "export WS_PRODUCTNAME="$WS_PRODUCTNAME
 echo "export WS_PROJECTNAME="$WS_PROJECTNAME
 echo "export WS_PROJECTTOKEN="$WS_PROJECTTOKEN
 echo "export WS_URL="$WS_URL
-echo "export GITHUB_BASEBRANCH="$GITHUB_BASE_REF
-echo "export wORKING_BASEBRANCH="$wORKING_BASEBRANCH
+echo "export GITHUB_BASEBRANCH="$GH_BRANCHNAME
 
 
 red=$'\e[1;31m'
@@ -68,7 +67,7 @@ arr=( $WS_BASEBRANCHLIST )
 
 for BASEBRANCH in "${arr[@]}"; do
     echo "Checking this branch: "$BASEBRANCH
-    if [[ " ${BASEBRANCH[*]} " = " ${WS_PROJECTNAME} " ]]; then
+    if [[ " ${BASEBRANCH[*]} " = " ${GITHUB_BASEBRANCH} " ]]; then
         wORKING_BASEBRANCH=$BASEBRANCH
     fi
 done
