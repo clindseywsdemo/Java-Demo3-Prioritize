@@ -69,7 +69,7 @@ do
         wORKING_BASEBRANCH=$WS_PROJECTNAME
     fi
 done
-echo "Looking for base branch complete"
+echo "Base branch to be used "$wORKING_BASEBRANCH
 
 # Get repo default branch projectToken from productToken
 REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
