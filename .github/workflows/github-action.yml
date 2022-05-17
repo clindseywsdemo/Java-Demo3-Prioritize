@@ -15,6 +15,7 @@ jobs:
       WS_WSS_URL: https://saas.whitesourcesoftware.com/agent
       WS_PRODUCTNAME: GH_${{github.event.repository.name}}
       WS_PROJECTNAME: ${{github.event.repository.name}}_${{github.ref_name}}_Prioritize
+      GH_BRANCHNAME: ${{github.ref_name}}
 
     runs-on: ubuntu-latest
 
