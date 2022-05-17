@@ -64,9 +64,9 @@ fi
 echo "Looking for base branch"
 # Get repo default branch projectToken from productToken
 WS_BASEBRANCHLIST=$(jq .scanSettings.baseBranches .whitesource)
-arr(WS_BASEBRANCHLIST)
+WS_BASEBRANCHLIST=$(echo $WS_BASEBRANCHLIST | sed -e 's/\[ //g' -e 's/\ ]//g' -e 's/\,//g')
 
-for BASEBRANCH in "${arr[@]}"; 
+for BASEBRANCH in "${WS_BASEBRANCHLIST[@]}"; 
 do
     echo "Checking this branch: "$BASEBRANCH
     if [[ " ${BASEBRANCH[*]} " = " ${WS_PROJECTNAME} " ]]; then
