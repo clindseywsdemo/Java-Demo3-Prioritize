@@ -66,6 +66,7 @@ WS_BASEBRANCHLIST=$(echo $WS_BASEBRANCHLIST | sed -e 's/\[ //g' -e 's/\ ]//g' -e
 arr=( $WS_BASEBRANCHLIST )
 
 for BASEBRANCH in "${arr[@]}"; do
+    BASEBRANCH=$(echo $BASEBRANCH | tr -d '"')
     echo "Checking this branch: "$BASEBRANCH
     echo "Checking github branch: "$GH_BRANCHNAME
     if [[ $BASEBRANCH = "$GH_BRANCHNAME" ]]; then
