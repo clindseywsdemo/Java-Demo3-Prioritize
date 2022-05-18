@@ -86,7 +86,7 @@ fi
 #REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
 #echo "getting projectToken for repository default branch" $REPOTOKEN
 
-REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg wORKING_BASEBRANCH $wORKING_BASEBRANCH '.projects[] | select(.projectName==$wORKING_BASEBRANCH) | .projectToken')
+REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PROJECTNAME $WS_PROJECTNAME '.projects[] | select(.projectName==$WS_PROJECTNAME) | .projectToken')
 echo "getting projectToken for repository default branch" $REPOTOKEN
         
 if [ -z "$REPOTOKEN" ]; then
