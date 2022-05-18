@@ -67,10 +67,14 @@ arr=( $WS_BASEBRANCHLIST )
 
 for BASEBRANCH in "${arr[@]}"; do
     BASEBRANCH=$(echo $BASEBRANCH | tr -d '"')
+    echo "Checking this branch: "$BASEBRANCH
+    echo "Checking github branch: "$GH_BRANCHNAME
     if [[ $BASEBRANCH = "$GH_BRANCHNAME" ]]; then
         wORKING_BASEBRANCH=$BASEBRANCH
+        echo "Set branch to: "$BASEBRANCH
     fi
 done
+echo "Base branch to be used "$wORKING_BASEBRANCH
 
 if [ -z "$wORKING_BASEBRANCH" ]; then
     echo "This branch '"$WS_PROJECTNAME"' was not found in the baseBranch list in the .whitesource file.  Exiting since there is nothing to be done."
