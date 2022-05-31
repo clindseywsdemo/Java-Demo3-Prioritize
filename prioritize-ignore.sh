@@ -86,7 +86,7 @@ if [ -z "$wORKING_BASEBRANCH" ]; then
         echo "getting projectToken for repository default branch" $REPOTOKEN
 fi
 
-if [ -z "$wORKING_BASEBRANCH" && -z "$REPOTOKEN" ]; then
+if [ ( -z "$wORKING_BASEBRANCH") -a ( -z "$REPOTOKEN") ]; then
         echo "This branch '"$WS_PROJECTNAME"' was not found in the baseBranch list in the .whitesource file.  Exiting since there is nothing to be done."
     exit
 fi
