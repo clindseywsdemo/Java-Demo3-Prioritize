@@ -77,7 +77,12 @@ done
 echo "Base branch to be used "$wORKING_BASEBRANCH
 
 if [ -z "$wORKING_BASEBRANCH" ]; then
-    echo "This branch '"$WS_PROJECTNAME"' was not found in the baseBranch list in the .whitesource file.  Exiting since there is nothing to be done."
+        REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
+        echo "getting projectToken for repository default branch" $REPOTOKEN
+fi
+
+if [ -z "$wORKING_BASEBRANCH" && "$REPOTOKEN" ]; then
+        echo "This branch '"$WS_PROJECTNAME"' was not found in the baseBranch list in the .whitesource file.  Exiting since there is nothing to be done."
     exit
 fi
 
@@ -86,8 +91,10 @@ fi
 #REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PRODUCTNAME $WS_PRODUCTNAME '.projects[] | select(.projectName==$WS_PRODUCTNAME) | .projectToken')
 #echo "getting projectToken for repository default branch" $REPOTOKEN
 
-REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PROJECTNAME $WS_PROJECTNAME '.projects[] | select(.projectName==$WS_PROJECTNAME) | .projectToken')
-echo "getting projectToken for repository default branch" $REPOTOKEN
+if [ -z "$wORKING_BASEBRANCH" && "$REPOTOKEN" ]; then
+        REPOTOKEN=$(curl --request POST $WS_URL'/api/v1.3' -H 'Content-Type: application/json'  -d '{ "requestType" : "getAllProjects",   "userKey" : "'$WS_USERKEY'",  "productToken": "'$WS_PRODUCTTOKEN'"}' | jq -r --arg WS_PROJECTNAME $WS_PROJECTNAME '.projects[] | select(.projectName==$WS_PROJECTNAME) | .projectToken')
+        echo "getting projectToken for repository default branch" $REPOTOKEN
+fi
         
 if [ -z "$REPOTOKEN" ]; then
         echo "productToken for repository default branch is empty - Exiting ('$WS_USERKEY')"
